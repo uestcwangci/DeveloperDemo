@@ -3,25 +3,35 @@ package com.example.dell.developerdemo;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.PluralsRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
+import com.example.dell.developerdemo.activities.BleActivity;
 import com.example.dell.developerdemo.activities.FindAllAP;
+import com.example.dell.developerdemo.activities.IntroActivity;
+import com.example.dell.developerdemo.activities.Main2Activity;
 import com.example.dell.developerdemo.activities.MapActivity;
 import com.example.dell.developerdemo.activities.WifiSample;
 
 public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSION_REQUEST_CODE = 10000;
+    private String[] activities = {"AP表单生成", "Wifi Sample", "KB240定位", "蓝牙定位", "欢迎页测试", "主界面"};
 
 
     @Override
@@ -29,20 +39,81 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initButton();
-        getPermission();
+        //  首次启动APP进入欢迎页面
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                //  Initialize SharedPreferences
+                SharedPreferences getPrefs = PreferenceManager
+                        .getDefaultSharedPreferences(getBaseContext());
 
+                //  Create a new boolean and preference and set it to true
+                boolean isFirstStart = getPrefs.getBoolean("firstStart", true);
+
+                //  If the activity has never started before...
+                if (isFirstStart) {
+
+                    //  Launch app intro
+                    final Intent i = new Intent(MainActivity.this, IntroActivity.class);
+
+                    runOnUiThread(new Runnable() {
+                        @Override public void run() {
+                            startActivity(i);
+                        }
+                    });
+
+                    //  Make a new preferences editor
+                    SharedPreferences.Editor e = getPrefs.edit();
+
+                    //  Edit preference to make it false because we don't want this to run again
+                    e.putBoolean("firstStart", false);
+
+                    //  Apply changes
+                    e.apply();
+                }
+            }
+        });
+        // Start the thread
+        t.start();
+
+        getPermission();
     }
 
 
 
     private void initButton() {
-            ButtonListener buttonListener = new ButtonListener();
-            Button APList = findViewById(R.id.APlist);
-            Button wifiSample = findViewById(R.id.wifiSample);
-            Button kbmap = findViewById(R.id.kbmap);
-            APList.setOnClickListener(buttonListener);
-            wifiSample.setOnClickListener(buttonListener);
-            kbmap.setOnClickListener(buttonListener);
+        ListView listView = findViewById(R.id.select_list);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(MainActivity.this, android.R.layout.simple_list_item_1, activities);
+        listView.setAdapter(adapter);
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                switch (position) {
+                    case 0:
+                        startActivity(new Intent(getApplicationContext(), FindAllAP.class));
+                        break;
+                    case 1:
+                        startActivity(new Intent(getApplicationContext(), WifiSample.class));
+                        break;
+                    case 2:
+                        startActivity(new Intent(getApplicationContext(), MapActivity.class));
+                        break;
+                    case 3:
+                        startActivity(new Intent(getApplicationContext(), BleActivity.class));
+                        break;
+                    case 4:
+                        startActivity(new Intent(getApplicationContext(), IntroActivity.class));
+                        break;
+                    case 5:
+                        startActivity(new Intent(getApplicationContext(), Main2Activity.class));
+                        break;
+                    default:
+                        break;
+
+                }
+            }
+        });
     }
 
     private void getPermission() {
@@ -51,7 +122,8 @@ public class MainActivity extends AppCompatActivity {
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE};
+                Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                Manifest.permission.RECORD_AUDIO};
         // 检查是否有相应的权限
         boolean isAllGranted = checkPermissionAllGranted(permissionStr);
         // 如果权限全都拥有, 则直接执行备份代码
@@ -128,28 +200,6 @@ public class MainActivity extends AppCompatActivity {
         });
         builder.setNegativeButton("取消", null);
         builder.show();
-    }
-
-
-
-    class ButtonListener implements View.OnClickListener{
-
-        @Override
-        public void onClick(View v) {
-            switch (v.getId()){
-                case R.id.APlist:
-                    startActivity(new Intent(getApplicationContext(), FindAllAP.class));
-                    break;
-                case R.id.wifiSample:
-                    startActivity(new Intent(getApplicationContext(), WifiSample.class));
-                    break;
-                case R.id.kbmap:
-                    startActivity(new Intent(getApplicationContext(), MapActivity.class));
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
 }
