@@ -1,20 +1,25 @@
-package com.example.dell.developerdemo.activities;
+package com.example.dell.developerdemo.fragments;
 
 import android.annotation.SuppressLint;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.net.Uri;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
+import android.support.constraint.ConstraintLayout;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.EditText;
@@ -23,14 +28,32 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.dell.developerdemo.R;
+import com.example.dell.developerdemo.activities.FindAllAP;
 import com.example.dell.developerdemo.beans.AP;
 
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.zip.Inflater;
 
-public class FindAllAP extends AppCompatActivity{
+import static android.content.Context.WIFI_SERVICE;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link FindAllApFragment.OnFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link FindAllApFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class FindAllApFragment extends Fragment {
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private View mView;
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
     private static final int MSG_SCAN = 449;
     private static final int SCAN1000 = 587;
     private TextView textView;
@@ -39,20 +62,101 @@ public class FindAllAP extends AppCompatActivity{
     private SQLiteDatabase db;
     private Thread KeepRunning,scan_1000,RunOneTime;
     private boolean isRun;
-    private static final String TAG = "FindAllAP";
+    private static final String TAG = "FindAllApFragment";
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+    private OnFragmentInteractionListener mListener;
+
+    public FindAllApFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment FindAllApFragment.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static FindAllApFragment newInstance(String param1, String param2) {
+        FindAllApFragment fragment = new FindAllApFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_find_all_ap);
-        textView = findViewById(R.id.textview);
-        area = findViewById(R.id.area);
-        areaNum = findViewById(R.id.area_num);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+
+
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        View view = inflater.inflate(R.layout.fragment_find_all_ap, container, false);
+        mView = view;
+        textView = view.findViewById(R.id.textview);
+        area = view.findViewById(R.id.area);
+        areaNum = view.findViewById(R.id.area_num);
         initButton();
         Log.e("db", Environment.getExternalStorageDirectory().getPath());
         db = SQLiteDatabase.openOrCreateDatabase(Environment.getExternalStorageDirectory()+ "/TotalAP.db",null);
         createTable(db);
         initThread();
+        return view;
+    }
 
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onFragmentInteraction(uri);
+        }
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
     }
 
     private void initThread() {
@@ -60,7 +164,7 @@ public class FindAllAP extends AppCompatActivity{
         {
             public void run()
             {
-                runOnUiThread(new Runnable()
+                getActivity().runOnUiThread(new Runnable()
                 {
                     public void run()
                     {
@@ -72,15 +176,15 @@ public class FindAllAP extends AppCompatActivity{
     }
 
     private void initButton() {
-            ButtonListener buttonListener = new ButtonListener();
-            Button sample = findViewById(R.id.sample);
-            Button initBt = findViewById(R.id.clear);
-            Button insertBt = findViewById(R.id.insert_db);
-            ToggleButton toggleBt = findViewById(R.id.toggleSample);
-            sample.setOnClickListener(buttonListener);
-            initBt.setOnClickListener(buttonListener);
-            insertBt.setOnClickListener(buttonListener);
-            toggleBt.setOnCheckedChangeListener(buttonListener);
+        ButtonListener buttonListener = new ButtonListener();
+        Button sample = mView.findViewById(R.id.sample);
+        Button initBt = mView.findViewById(R.id.clear);
+        Button insertBt = mView.findViewById(R.id.insert_db);
+        ToggleButton toggleBt = mView.findViewById(R.id.toggleSample);
+        sample.setOnClickListener(buttonListener);
+        initBt.setOnClickListener(buttonListener);
+        insertBt.setOnClickListener(buttonListener);
+        toggleBt.setOnCheckedChangeListener(buttonListener);
     }
 
 
@@ -121,7 +225,7 @@ public class FindAllAP extends AppCompatActivity{
     private void showWifiInfo() {
         StringBuilder scanBuilder = new StringBuilder();
         WifiManager wifiManager;
-        wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        wifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(WIFI_SERVICE);
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
         }
@@ -139,7 +243,7 @@ public class FindAllAP extends AppCompatActivity{
 
     private void obtainWifiInfo() {
         WifiManager wifiManager;
-        wifiManager= (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+        wifiManager= (WifiManager) getContext().getApplicationContext().getSystemService(WIFI_SERVICE);
         if (!wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(true);
         }
@@ -326,7 +430,7 @@ public class FindAllAP extends AppCompatActivity{
 
     private void showDialog()
     {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         builder.setIcon(R.mipmap.ic_launcher);
         builder.setTitle("采集完成");
         builder.setMessage("采集1000点完成");//提示内容
@@ -335,7 +439,7 @@ public class FindAllAP extends AppCompatActivity{
             @Override
             public void onClick(DialogInterface dialog, int which)
             {
-                Toast.makeText(getApplicationContext(), "点击了确定按钮", Toast.LENGTH_SHORT).show();
+                Toast.makeText(Objects.requireNonNull(getActivity()).getApplicationContext(), "点击了确定按钮", Toast.LENGTH_SHORT).show();
             }
         });
         AlertDialog dialog = builder.create();

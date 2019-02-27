@@ -21,22 +21,6 @@
             app:layout_scrollFlags="scroll|enterAlways|snap"
             app:popupTheme="@style/PopupOverlay" />
 
-
-    </android.support.design.widget.AppBarLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
-
-        <android.support.v4.view.ViewPager
-            android:id="@+id/vp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </android.support.v4.view.ViewPager>
-
         <com.flyco.tablayout.SlidingTabLayout
             android:id="@+id/slide_layout"
             android:layout_width="match_parent"
@@ -51,7 +35,41 @@
             app:tl_underline_gravity="TOP"
             app:tl_underline_height="1dp" />
 
-    </LinearLayout>
+
+
+
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <com.example.dell.developerdemo.beans.MyViewPager
+                android:id="@+id/my_vp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <!--<android.support.v4.view.ViewPager-->
+                <!--android:id="@+id/vp"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"/>-->
+
+
+
+
+
+
+        </LinearLayout>
+
+
+    </android.support.v4.widget.NestedScrollView>
 
 
     <!--<include layout="@layout/content_main2" />-->

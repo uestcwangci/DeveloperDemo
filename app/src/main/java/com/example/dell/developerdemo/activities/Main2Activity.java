@@ -1,6 +1,7 @@
 package com.example.dell.developerdemo.activities;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -22,6 +23,7 @@ import android.view.MenuItem;
 
 import com.example.dell.developerdemo.R;
 import com.example.dell.developerdemo.adapters.FunctionsAdapter;
+import com.example.dell.developerdemo.fragments.FindAllApFragment;
 import com.example.dell.developerdemo.fragments.SimpleCardFragment;
 import com.example.dell.developerdemo.util.ViewFindUtils;
 import com.flyco.tablayout.SlidingTabLayout;
@@ -30,10 +32,10 @@ import com.flyco.tablayout.listener.OnTabSelectListener;
 import java.util.ArrayList;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnTabSelectListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnTabSelectListener, FindAllApFragment.OnFragmentInteractionListener {
     private Context mContext = this;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
-    private final String[] mTitles = new String[]{"AP表单生成", "WiFi Sample", "WiFi定位", "BLE定位", "欢迎页测试"};
+    private final String[] mTitles = new String[]{"AP表单生成"};
     private MyPagerAdapter mAdapter;
 
     @Override
@@ -42,7 +44,6 @@ public class Main2Activity extends AppCompatActivity
         setContentView(R.layout.activity_main2);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -66,16 +67,18 @@ public class Main2Activity extends AppCompatActivity
     }
 
     private void initTitles() {
-        for (String title : mTitles) {
-            mFragments.add(SimpleCardFragment.getInstance(title));
-        }
+        mFragments.add(FindAllApFragment.newInstance("a", "b"));
+//        for (String title : mTitles) {
+//            mFragments.add(SimpleCardFragment.getInstance(title));
+//        }
         View decorView = getWindow().getDecorView();
-        ViewPager vp = ViewFindUtils.find(decorView, R.id.vp);
+        ViewPager vp = ViewFindUtils.find(decorView, R.id.my_vp);
         mAdapter = new MyPagerAdapter(getSupportFragmentManager());
         vp.setAdapter(mAdapter);
 
         SlidingTabLayout tabLayout = ViewFindUtils.find(decorView, R.id.slide_layout);
         tabLayout.setViewPager(vp, mTitles, this, mFragments);
+
 
         tabLayout.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
@@ -145,6 +148,11 @@ public class Main2Activity extends AppCompatActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @Override
+    public void onFragmentInteraction(Uri uri) {
+
     }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {
