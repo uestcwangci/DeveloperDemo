@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -28,7 +27,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.dell.developerdemo.R;
-import com.example.dell.developerdemo.activities.FindAllAP;
 import com.example.dell.developerdemo.beans.AP;
 
 import java.util.Calendar;
@@ -36,7 +34,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.zip.Inflater;
 
 import static android.content.Context.WIFI_SERVICE;
 

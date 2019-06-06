@@ -13,8 +13,6 @@ import android.view.WindowManager;
 import com.example.dell.developerdemo.R;
 import com.example.dell.developerdemo.fragments.MySlide;
 import com.github.paolorotolo.appintro.AppIntro;
-import com.github.paolorotolo.appintro.AppIntroFragment;
-import com.github.paolorotolo.appintro.model.SliderPage;
 
 
 public class IntroActivity extends AppIntro {

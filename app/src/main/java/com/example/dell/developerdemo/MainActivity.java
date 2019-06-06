@@ -6,11 +6,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.PluralsRes;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
@@ -18,20 +19,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.example.dell.developerdemo.activities.BleActivity;
-import com.example.dell.developerdemo.activities.FindAllAP;
 import com.example.dell.developerdemo.activities.IntroActivity;
 import com.example.dell.developerdemo.activities.Main2Activity;
-import com.example.dell.developerdemo.activities.MapActivity;
-import com.example.dell.developerdemo.activities.WifiSample;
 
 public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSION_REQUEST_CODE = 10000;
-    private String[] activities = {"AP表单生成", "Wifi Sample", "KB240定位", "蓝牙定位", "欢迎页测试", "主界面"};
+    private String[] activities = {"欢迎页测试", "主界面"};
 
 
     @Override
@@ -91,21 +87,9 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 switch (position) {
                     case 0:
-                        startActivity(new Intent(getApplicationContext(), FindAllAP.class));
-                        break;
-                    case 1:
-                        startActivity(new Intent(getApplicationContext(), WifiSample.class));
-                        break;
-                    case 2:
-                        startActivity(new Intent(getApplicationContext(), MapActivity.class));
-                        break;
-                    case 3:
-                        startActivity(new Intent(getApplicationContext(), BleActivity.class));
-                        break;
-                    case 4:
                         startActivity(new Intent(getApplicationContext(), IntroActivity.class));
                         break;
-                    case 5:
+                    case 1:
                         startActivity(new Intent(getApplicationContext(), Main2Activity.class));
                         break;
                     default:
@@ -118,12 +102,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void getPermission() {
         // 要申请的权限
-        String[] permissionStr = new String[]{
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-                Manifest.permission.READ_EXTERNAL_STORAGE,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                Manifest.permission.RECORD_AUDIO};
+        String[] permissionStr;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            permissionStr = new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.RECORD_AUDIO,
+                    Manifest.permission.FOREGROUND_SERVICE};
+        } else {
+            permissionStr = new String[]{
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                    Manifest.permission.RECORD_AUDIO};
+        }
         // 检查是否有相应的权限
         boolean isAllGranted = checkPermissionAllGranted(permissionStr);
         // 如果权限全都拥有, 则直接执行备份代码

@@ -33,6 +33,7 @@ public class TestActivity extends AppCompatActivity {
 
 
 
+
     thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -52,7 +53,6 @@ public class TestActivity extends AppCompatActivity {
                 sqLiteDatabase.close();
             }
         });
-    thread.start();
 
     }
 

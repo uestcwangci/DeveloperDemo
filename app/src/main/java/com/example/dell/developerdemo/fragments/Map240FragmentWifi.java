@@ -1,4 +1,5 @@
-package com.example.dell.developerdemo.activities;
+package com.example.dell.developerdemo.fragments;
+
 
 import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
@@ -11,14 +12,16 @@ import android.graphics.BitmapFactory;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
@@ -34,10 +37,10 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.example.dell.developerdemo.R;
+import com.example.dell.developerdemo.beans.WifiData;
 import com.example.dell.developerdemo.util.DBManager;
 import com.example.dell.developerdemo.util.IconView;
 import com.example.dell.developerdemo.util.RssiDBManager;
-import com.example.dell.developerdemo.beans.WifiData;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +50,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class MapActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link Map240FragmentWifi#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class Map240FragmentWifi extends Fragment {
+    // TODO: Rename parameter arguments, choose names that match
+    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
     private static final int APNUM = 4;
     private static final int XMAX = 5;
     private static final int YMAX = 6;
@@ -60,6 +72,7 @@ public class MapActivity extends AppCompatActivity {
     private static final double RSSI_WEIGHT = 0.5;
     private static final String TAG = "myWifi";
 
+    private View mView;
     ScrollView scrollView;
     TextView info;
     ImageView locIcon;
@@ -108,40 +121,79 @@ public class MapActivity extends AppCompatActivity {
         }
     };
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
-                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        initWifiManager();
-        setContentView(R.layout.activity_map);
-        initUI();
+
+    // TODO: Rename and change types of parameters
+    private String mParam1;
+    private String mParam2;
+
+
+    public Map240FragmentWifi() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param param1 Parameter 1.
+     * @param param2 Parameter 2.
+     * @return A new instance of fragment Map240FragmentWifi.
+     */
+    // TODO: Rename and change types and number of parameters
+    public static Map240FragmentWifi newInstance(String param1, String param2) {
+        Map240FragmentWifi fragment = new Map240FragmentWifi();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
-    protected void onDestroy() {
-        unregisterReceiver(wifiScanReceiver);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        mView = inflater.inflate(R.layout.fragment_map240, container, false);
+        getActivity().getWindow().setFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON,
+                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        initWifiManager();
+        initUI();
+        return mView;
+    }
+
+    @Override
+    public void onDestroy() {
+        getActivity().unregisterReceiver(wifiScanReceiver);
         super.onDestroy();
     }
 
     private void initUI() {
-        scrollView = findViewById(R.id.sv);
+        scrollView = mView.findViewById(R.id.sv);
 
         ButtonListener buttonListener = new ButtonListener();
-        Button init = findViewById(R.id.init_bt);
-        Button testBt = findViewById(R.id.test_bt);
+        Button init = mView.findViewById(R.id.init_bt);
+        Button testBt = mView.findViewById(R.id.test_bt);
         init.setOnClickListener(buttonListener);
         testBt.setOnClickListener(buttonListener);
 
-        locIcon = findViewById(R.id.loc_icon);
-        positionTogBtn = findViewById(R.id.wknn);
-        kalman = findViewById(R.id.kalman);
-        info = findViewById(R.id.textInfo);
-        iconView = new IconView(MapActivity.this);
-        x = findViewById(R.id.x);
-        y = findViewById(R.id.y);
+        locIcon = mView.findViewById(R.id.loc_icon);
+        positionTogBtn = mView.findViewById(R.id.wknn);
+        kalman = mView.findViewById(R.id.kalman);
+        info = mView.findViewById(R.id.textInfo);
+        iconView = new IconView(getContext());
+        x = mView.findViewById(R.id.x);
+        y = mView.findViewById(R.id.y);
 
-        kbMap = findViewById(R.id.kbmap);
+        kbMap = mView.findViewById(R.id.kbmap);
         // 获取屏幕宽高,转换图与屏幕大小
         DisplayMetrics dm = getResources().getDisplayMetrics();
         int screenWidth = dm.widthPixels;
@@ -214,7 +266,7 @@ public class MapActivity extends AppCompatActivity {
                     readAPDatabase();
                     initWifiSet();
                     initWifiMap();
-                    Toast.makeText(MapActivity.this, "初始化成功", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "初始化成功", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.test_bt:
                     TranslateAnimation animation = new TranslateAnimation(
@@ -231,13 +283,13 @@ public class MapActivity extends AppCompatActivity {
 
     private void initWifiManager() {
         this.results = null;
-        mWifiManager = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
+        mWifiManager = (WifiManager) getActivity().getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         if (!mWifiManager.isWifiEnabled()) {// 打开wifi
             mWifiManager.setWifiEnabled(true);
         }
         IntentFilter wifiFilter = new IntentFilter();
         wifiFilter.addAction(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION);
-        this.registerReceiver(wifiScanReceiver, wifiFilter);
+        getActivity().registerReceiver(wifiScanReceiver, wifiFilter);
 //        success = mWifiManager.startScan();
     }
 
@@ -385,8 +437,9 @@ public class MapActivity extends AppCompatActivity {
     }
 
 
-    private double kalNextPX = 1;// X方向后验估计的方差
-    private double kalNextPY = 1;// Y方向后验估计的方差
+//    private double kalNextPX = 1;// X方向后验估计的方差
+//    private double kalNextPY = 1;// Y方向后验估计的方差
+    private double[] kalNextP = new double[]{1, 1};//X、Y方向后验估计的方差
 
     private void kalmanFilter(double[] last, double[] cur) {
         double R = 10;// R测量方差，反应当前的测量精度
@@ -399,25 +452,17 @@ public class MapActivity extends AppCompatActivity {
             // 初始化
             hatminus = last[i];
             // 滤波
-            if (i == 0) {
-                currentP = kalNextPX + Q;
-                K = currentP / (currentP + R);
-                cur[i] = hatminus + K * (currentX - hatminus);
-                kalNextPX = (1 - K) * currentP;
-            } else {
-                currentP = kalNextPY + Q;
-                K = currentP / (currentP + R);
-                cur[i] = hatminus + K * (currentX - hatminus);
-                kalNextPY = (1 - K) * currentP;
-            }
-
+            currentP = kalNextP[i] + Q;
+            K = currentP / (currentP + R);
+            cur[i] = hatminus + K * (currentX - hatminus);
+            kalNextP[i] = (1 - K) * currentP;
         }
     }
 
 
 
     private void readFingerDatabase(int APNum) {
-        RssiDBManager rssiDBManager = new RssiDBManager(getApplicationContext());
+        RssiDBManager rssiDBManager = new RssiDBManager(getContext().getApplicationContext());
         SQLiteDatabase sqLiteDatabase = rssiDBManager.manage("esp_buy_map.db");
         String[] columns = new String[APNum + 2];
         columns[0] = "x";
@@ -441,7 +486,7 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void readAPDatabase() {
-        DBManager dbManager = new DBManager(getApplicationContext());
+        DBManager dbManager = new DBManager(getContext().getApplicationContext());
         SQLiteDatabase sqLiteDatabase = dbManager.manage("ESPonly.db");
         String[] columns = new String[]{"Name", "Mac"};
         wifiForm = dbManager.query(sqLiteDatabase, "wiwide", columns, null, null);
@@ -476,7 +521,7 @@ public class MapActivity extends AppCompatActivity {
                     }
                     curLoc = Awknn(wifiMap, K, A);
                     info.setText(String.format("X:%1.2f\nY:%1.2f", curLoc[0], curLoc[1]));
-                    Toast.makeText(MapActivity.this, "以获取第一个点", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "以获取第一个点", Toast.LENGTH_SHORT).show();
                     flag = START_SCAN;
                     mWifiManager.startScan();
                     break;
@@ -494,15 +539,13 @@ public class MapActivity extends AppCompatActivity {
                     mWifiManager.startScan();
                     break;
                 case STOP_SCAN:
-                    Toast.makeText(getApplicationContext(), "Stop Scan", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Stop Scan", Toast.LENGTH_SHORT).show();
                     break;
                 default:
                     break;
             }
         }
     };
-
-
 
 
 }

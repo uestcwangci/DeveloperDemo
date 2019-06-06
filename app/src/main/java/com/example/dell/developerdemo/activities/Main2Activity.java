@@ -9,8 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,9 +20,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.dell.developerdemo.R;
-import com.example.dell.developerdemo.adapters.FunctionsAdapter;
+import com.example.dell.developerdemo.fragments.BleFragment;
 import com.example.dell.developerdemo.fragments.FindAllApFragment;
-import com.example.dell.developerdemo.fragments.SimpleCardFragment;
+import com.example.dell.developerdemo.fragments.Map240FragmentWifi;
+import com.example.dell.developerdemo.fragments.Map343FragmentBle;
+import com.example.dell.developerdemo.fragments.WifiSampleFragment;
 import com.example.dell.developerdemo.util.ViewFindUtils;
 import com.flyco.tablayout.SlidingTabLayout;
 import com.flyco.tablayout.listener.OnTabSelectListener;
@@ -32,10 +32,11 @@ import com.flyco.tablayout.listener.OnTabSelectListener;
 import java.util.ArrayList;
 
 public class Main2Activity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnTabSelectListener, FindAllApFragment.OnFragmentInteractionListener {
+        implements NavigationView.OnNavigationItemSelectedListener, OnTabSelectListener,
+        WifiSampleFragment.OnFragmentInteractionListener, FindAllApFragment.OnFragmentInteractionListener {
     private Context mContext = this;
     private ArrayList<Fragment> mFragments = new ArrayList<>();
-    private final String[] mTitles = new String[]{"AP表单生成"};
+    private final String[] mTitles = new String[]{"AP表单生成", "WiFiSample", "KB240", "蓝牙扫描", "蓝牙定位"};
     private MyPagerAdapter mAdapter;
 
     @Override
@@ -68,6 +69,10 @@ public class Main2Activity extends AppCompatActivity
 
     private void initTitles() {
         mFragments.add(FindAllApFragment.newInstance("a", "b"));
+        mFragments.add(WifiSampleFragment.newInstance("a", "b"));
+        mFragments.add(Map240FragmentWifi.newInstance("a", "b"));
+        mFragments.add(BleFragment.newInstance("a", "b"));
+        mFragments.add(Map343FragmentBle.newInstance("a", "b"));
 //        for (String title : mTitles) {
 //            mFragments.add(SimpleCardFragment.getInstance(title));
 //        }
@@ -183,6 +188,7 @@ public class Main2Activity extends AppCompatActivity
 
     @Override
     public void onTabReselect(int position) {
-
     }
 }
+
+
